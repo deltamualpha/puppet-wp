@@ -8,7 +8,7 @@ class wp::cli (
 		'CentOS'		=> 'php',
 		/^(Debian|Ubuntu)$/	=> 'php5',
 		default			=> 'php',
-	} 
+	}
 
 	if 'installed' == $ensure or 'present' == $ensure {
 		# Create the install path
@@ -69,8 +69,8 @@ class wp::cli (
 		}
 	}
 
-	if ! defined(Package["$phpprefix-cli"]) {
-		package { "$phpprefix-cli":
+	if ! defined(Package["${phpprefix}-cli"]) {
+		package { "${phpprefix}-cli":
 			ensure => installed,
 		}
 	}
