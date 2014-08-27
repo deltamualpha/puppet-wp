@@ -8,33 +8,38 @@ define wp::plugin (
 
 	case $ensure {
 		enabled: {
-			$command = "activate $slug"
+			if ( $networkwide ) {
+				$command = "plugin activate ${slug} --network"
+			} else {
+				$command = "plugin activate ${slug}"
+			}
 
-			exec { "wp install plugin $title":
-				cwd     => $location,
-				command => "/usr/bin/wp plugin install $slug",
-				unless  => "/usr/bin/wp plugin is-installed $slug",
-				before  => Wp::Command["$location plugin $slug $ensure"],
-				require => Class["wp::cli"],
-				onlyif  => "/usr/bin/wp core is-installed"
+			wp::command { "plugin install ${slug}":
+				command  => "plugin install ${slug}",
+				unless   => "plugin is-installed ${slug}",
+				location => $location,
+				before   => Wp::Command["plugin activate ${slug}"],
+			}
+
+			wp::command { "plugin activate ${slug}":
+				command  => $command,
+				location => $location,
 			}
 		}
 		disabled: {
-			$command = "deactivate $slug"
+			if ( $networkwide ) {
+				$command = "plugin deactivate ${slug} --network"
+			} else {
+				$command = "plugin deactivate ${slug}"
+			}
+
+			wp::command { "plugin deactivate ${slug}":
+				command  => $command,
+				location => $location,
+			}
 		}
 		default: {
 			fail("Invalid ensure for wp::plugin")
 		}
-	}
-
-	if $networkwide {
-		$args = "plugin $command --network"
-	}
-	else {
-		$args = "plugin $command"
-	}
-	wp::command { "$location plugin $slug $ensure":
-		location => $location,
-		command => $args
 	}
 }
