@@ -1,3 +1,3 @@
 class wp::params {
-	$user = 'vagrant'
+	$user = 'www-data'
 }
